@@ -1,0 +1,37 @@
+#cloud-config
+users:
+  - name: falko
+    groups: users, admin
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDU5HkuIRg1MUnbhUIHieRdPOhOU7FPkByAb4R98entkH1vzmsd+ox9fNXkWsZrTuwK9QnaGeftKZODoCkESqK/DZMv588YcuqgZObW6/T8hs9sgAsD9SSbJetunUYo9fi+tebhAbKINj0FHW1KjOXpckHEEen0MWbPgXqHIQ3968qnT4lIzvVHuVctQFbw7RfLGoY0Sdntssw1WX7/EdatK0nYFBZ3XZWIlDBA2KyTVDGlm2/8lXQs9hELKC2FHDB7X0q4Ay43Z9Szz9KDR3uNAYPM02kVFunCouRCpk1VaDAntIpmao2yMOZwzstGwMDV46nFG7HChXsi3T5283ej falko@falko-pc
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC4yiLe3F4kzufqi17tkmHwsO+0iLw8qxRqUDZqy6fycZd0JRJiwetbXn7+9K/n/whoCPJEYLRY9n1lt+rCbxupRvqL4ck9ezckp1Gd1mJYaR4z96QmB/illXF/zUPPKRpoixTu8MF48nt3Nlk+0im7blcEo2ZTCDq/IEQPtLjNP9i3ean0bYcJ07CRR92N270YLHpRHa0jA7s6qTSE8o6GUS29jVpNJJEDL4FXrFyhwbMy47op3Gf9QJ9SB/Xow9IPCDZpb3UaXgrrFyTnN6lGmFWyll6PWlY0GspF/bh6jaP1qGKfDKr1SkvtSunjsU0OKn72Tlx1vEE1/dYlsw5Ln1bKTd7hUTMTQ205YeWRhsdttTRuocigy5Q6vuSK6rbtcDL5eIwwADCD4tKbwiQmbzWWIQwbkeczl3EW9BbXcwTc6y8DwOqfUXkpkU/z7CJmeWDIau+9chI4JtbYmLy6UZ64uNpVdFnHVBvU4dQwtKStUhnPOd/ofCrnREQsGNE= falko@webssh
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDusO5MsE91HnsvrBUBmLWgw16WXuTVS4Wwu4d6L3sreU3mZKCB3blMni7ddW/onkYVUKvatj/OZnsXB/KAt+6X3M2DVzXzi6a3DfHbiVveElwKNVjSuXKbnOUPp59E+6TKJLtT0hi7H+O04SQeMQv0GmU0oSwE0MnlPkervTbUxv6y+ZThLA6TSCutK9RjHG8Pqqtuc3ueJKN/hjQwbvBwVBcz2xt1nr50YMe1Yim22siBRCAiIE35RYi4ZmPoH5pXnWPG79uQTM/TMgmIh2IU+rQfFmPLnZz+yx/iT33A8WLufisMxUmuJw9E5qHF6IrBJyX4RwoWQHOwUgeuXjBd19zOwrx2L72hSHTRoU485+Tb7+1y6jVLLCAYrEvVAWD9S1UiUzD0wepDF+PrtCHkPaOd68g14cNsoAcFLDhjkbboBCQeBUhlDS4fNVc0jfoaeOCXFgwLvduievaqLUozDheb+kTtM+pggeZf3wzbYVZdY78pDdXIHFWe3AfcgzU= falko@webssh
+repo_update: true
+repo_upgrade: all
+package_update: true
+package_upgrade: true
+packages:
+- aria2
+- git
+- tmux
+- vim
+write_files:
+- content: |
+    # /bin/bash
+    #IP=$( dig +short myip.opendns.com @resolver1.opendns.com )
+    #IP=$(https://api.ipify.org/?format=text)
+    IP=$( curl https://ip4.seeip.org )
+    echo $IP
+    curl -v -u ${dyndnsuser}:${dyndnspass} "${dyndnsurl}?subdomain=${hostname}&address=$IP"
+    exit 0
+  path: /root/updatedns.sh
+  permissions: "0755"
+runcmd:
+  - apt-get update -y && apt-get -y dist-upgrade && apt-get -y autoremove
+  # twice, sometimes it doesn't work
+  - sleep 5
+  - apt-get install -y aria2 curl git gnupg tmux vim
+  - cd /root && curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && chmod 755 msfinstall && ./msfinstall
+  - /root/updatedns.sh

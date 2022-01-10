@@ -1,0 +1,12 @@
+hcloud_token = "E8qFeqJFu4iNbSqh4NPQF1jOGBNfCEv3EXcg87xJdC4AJbDC0esKNBAd27BNnxkL"
+server_type = "cx11"
+image = "debian-11"
+
+hostname = "metasploit"
+domain = "bambini-vandali.de"
+
+ssh_key_fingerprint = "a8:4f:c7:8c:68:db:cb:e1:3b:a6:43:3e:95:1d:39:39"
+
+dyndnsuser = "oma"
+dyndnspass = "oma2018"
+dyndnsurl = "https://titan234.startdedicated.de/ddns-bambini-vandali.php
